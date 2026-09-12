@@ -4,7 +4,26 @@
   "version": "1.0.0",
   "description": "Save, edit, and inject your prompts into any AI tool's input box.",
   "permissions": ["storage", "activeTab", "scripting"],
-  "host_permissions": ["<all_urls>"],
+  "host_permissions": [
+"https://chatgpt.com/*",
+"https://chat.openai.com/*",
+"https://claude.ai/*",
+"https://gemini.google.com/*",
+"https://copilot.microsoft.com/*",
+"https://www.bing.com/chat*",
+"https://perplexity.ai/*",
+"https://www.perplexity.ai/*",
+"https://poe.com/*",
+"https://you.com/*",
+"https://huggingface.co/chat*",
+"https://grok.com/*",
+"https://x.com/i/grok*",
+"https://chat.mistral.ai/*",
+"https://chat.deepseek.com/*",
+"https://www.meta.ai/*",
+"https://character.ai/*",
+"https://www.character.ai/*"
+  ],
   "action": {
     "default_popup": "popup.html",
     "default_icon": {
@@ -23,7 +42,26 @@
   },
   "content_scripts": [
     {
-      "matches": ["<all_urls>"],
+      "matches": [
+"https://chatgpt.com/*",
+"https://chat.openai.com/*",
+"https://claude.ai/*",
+"https://gemini.google.com/*",
+"https://copilot.microsoft.com/*",
+"https://www.bing.com/chat*",
+"https://perplexity.ai/*",
+"https://www.perplexity.ai/*",
+"https://poe.com/*",
+"https://you.com/*",
+"https://huggingface.co/chat*",
+"https://grok.com/*",
+"https://x.com/i/grok*",
+"https://chat.mistral.ai/*",
+"https://chat.deepseek.com/*",
+"https://www.meta.ai/*",
+"https://character.ai/*",
+"https://www.character.ai/*"
+      ],
       "js": ["content.js"],
       "css": ["content.css"],
       "run_at": "document_idle"
