@@ -12,13 +12,17 @@ let editingId = null;
 
 function getPrompts() {
   return new Promise((resolve) => {
-    chrome.storage.local.get([STORAGE_KEY], (res) => resolve(res[STORAGE_KEY] || []));
+    try {
+      chrome.storage.local.get([STORAGE_KEY], (res) => resolve(res[STORAGE_KEY] || []));
+    } catch (e) { resolve([]); }
   });
 }
 
 function setPrompts(prompts) {
   return new Promise((resolve) => {
-    chrome.storage.local.set({ [STORAGE_KEY]: prompts }, resolve);
+    try {
+      chrome.storage.local.set({ [STORAGE_KEY]: prompts }, () => resolve(true));
+    } catch (e) { resolve(false); }
   });
 }
 
@@ -78,13 +82,17 @@ function showStatus(text, isError) {
 function injectFromPopup(text) {
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
     if (!tabs[0] || !tabs[0].id) return;
-    chrome.tabs.sendMessage(tabs[0].id, { type: 'PV_INJECT', text }, (resp) => {
-      if (chrome.runtime.lastError || !resp || !resp.ok) {
-        showStatus('Click an AI input box on the page first.', true);
-      } else {
-        window.close();
-      }
-    });
+    try {
+      chrome.tabs.sendMessage(tabs[0].id, { type: 'PV_INJECT', text }, (resp) => {
+        if (chrome.runtime.lastError || !resp || !resp.ok) {
+          showStatus('Click an AI input box on the page first.', true);
+        } else {
+          window.close();
+        }
+      });
+    } catch (e) {
+      showStatus('Please refresh the AI site tab and try again.', true);
+    }
   });
 }
 

@@ -65,14 +65,29 @@
 
     const anchor = findAnchorButton(target);
     if (anchor && anchor.parentElement) {
+      const parent = anchor.parentElement;
+      const beforeH = parent.getBoundingClientRect().height;
+      const beforeOverflow = parent.scrollWidth > parent.clientWidth + 1;
       logoEl.classList.add('pv-logo-inline');
       const r = anchor.getBoundingClientRect();
       const s = Math.max(20, Math.min(32, Math.round(Math.min(r.width, r.height)) || 24));
       logoEl.style.width = s + 'px';
       logoEl.style.height = s + 'px';
       logoEl.style.fontSize = Math.max(8, Math.round(s * 0.4)) + 'px';
-      anchor.parentElement.insertBefore(logoEl, anchor);
-      watchAnchorParent(target);
+      parent.insertBefore(logoEl, anchor);
+
+      const afterH = parent.getBoundingClientRect().height;
+      const afterOverflow = parent.scrollWidth > parent.clientWidth + 1;
+      if (afterH > beforeH + 2 || (afterOverflow && !beforeOverflow)) {
+        // Row wrapped or overflowed/overlapped — bail out to floating mode.
+        logoEl.remove();
+        logoEl.className = 'pv-logo pv-logo-floating';
+        document.body.appendChild(logoEl);
+        positionFloatingLogo(target);
+        watchFloatingTarget(target);
+      } else {
+        watchAnchorParent(target);
+      }
     } else {
       logoEl.classList.add('pv-logo-floating');
       document.body.appendChild(logoEl);
@@ -146,6 +161,14 @@
 
   async function openPanel(target) {
     closePanel();
+    if (!isExtCtxValid()) {
+      panelEl = document.createElement('div');
+      panelEl.className = 'pv-panel';
+      panelEl.innerHTML = '<div class="pv-panel-header">Prompt Vault</div><div class="pv-empty">Extension was updated. Please refresh this page to keep using Prompt Vault.</div>';
+      document.body.appendChild(panelEl);
+      positionPanel();
+      return;
+    }
     const prompts = await getPrompts();
     panelEl = document.createElement('div');
     panelEl.className = 'pv-panel';
@@ -237,11 +260,20 @@
   function positionPanel() {
     if (!logoEl || !panelEl) return;
     const rect = logoEl.getBoundingClientRect();
-    let top = rect.bottom + window.scrollY + 6;
-    let left = rect.left + window.scrollX;
     const panelWidth = 280;
+    const panelHeight = panelEl.offsetHeight || 300;
+
+    let left = rect.left + window.scrollX;
     if (left + panelWidth > window.innerWidth) {
       left = window.innerWidth - panelWidth - 10;
+    }
+    if (left < 4) left = 4;
+
+    let top = rect.bottom + window.scrollY + 6;
+    if (rect.bottom + panelHeight + 6 > window.innerHeight) {
+      // Not enough room below — open upward instead.
+      top = rect.top + window.scrollY - panelHeight - 6;
+      if (top < window.scrollY + 4) top = window.scrollY + 4;
     }
     panelEl.style.top = `${top}px`;
     panelEl.style.left = `${left}px`;
@@ -344,17 +376,32 @@
   }
 
   // Storage helpers
+  function isExtCtxValid() {
+    try {
+      return !!(chrome && chrome.runtime && chrome.runtime.id && chrome.storage && chrome.storage.local);
+    } catch (e) {
+      return false;
+    }
+  }
+
   function getPrompts() {
     return new Promise((resolve) => {
-      chrome.storage.local.get([STORAGE_KEY], (res) => {
-        resolve(res[STORAGE_KEY] || []);
-      });
+      if (!isExtCtxValid()) { resolve([]); return; }
+      try {
+        chrome.storage.local.get([STORAGE_KEY], (res) => {
+          if (chrome.runtime.lastError) { resolve([]); return; }
+          resolve(res[STORAGE_KEY] || []);
+        });
+      } catch (e) { resolve([]); }
     });
   }
 
   function setPrompts(prompts) {
     return new Promise((resolve) => {
-      chrome.storage.local.set({ [STORAGE_KEY]: prompts }, resolve);
+      if (!isExtCtxValid()) { resolve(false); return; }
+      try {
+        chrome.storage.local.set({ [STORAGE_KEY]: prompts }, () => resolve(true));
+      } catch (e) { resolve(false); }
     });
   }
 
@@ -408,13 +455,17 @@
   window.addEventListener('resize', () => { if (panelEl) positionPanel(); });
 
   // Keyboard shortcut + popup-triggered injection
-  chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
-    if (msg && msg.type === 'PV_TOGGLE') {
-      if (lastTarget) togglePanel(lastTarget);
-    } else if (msg && msg.type === 'PV_INJECT') {
-      const ok = injectPrompt(lastTarget, msg.text);
-      sendResponse({ ok });
-      return true;
-    }
-  });
+  try {
+    chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+      try {
+        if (msg && msg.type === 'PV_TOGGLE') {
+          if (lastTarget) togglePanel(lastTarget);
+        } else if (msg && msg.type === 'PV_INJECT') {
+          const ok = injectPrompt(lastTarget, msg.text);
+          sendResponse({ ok });
+          return true;
+        }
+      } catch (e) { /* context likely invalidated mid-message; ignore */ }
+    });
+  } catch (e) { /* extension context not ready/invalidated */ }
 })();
