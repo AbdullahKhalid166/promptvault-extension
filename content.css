@@ -1,0 +1,173 @@
+.pv-logo {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  background: #000;
+  color: #fff;
+  font: 700 10px -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.1s ease;
+  flex-shrink: 0;
+}
+
+.pv-logo:hover {
+  transform: scale(1.08);
+}
+
+/* Sits inline, next to a site's own send/mic button, in normal document
+   flow — no manual repositioning needed, it just moves with the layout. */
+.pv-logo-inline {
+  position: static;
+  display: inline-flex;
+  align-self: center;
+  margin: 0 4px;
+}
+
+/* Fallback when no nearby button is found: absolutely positioned and
+   kept in sync via ResizeObserver + input events. */
+.pv-logo-floating {
+  position: absolute;
+  z-index: 2147483000;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.25);
+}
+
+.pv-panel {
+  position: absolute;
+  width: 280px;
+  max-height: 360px;
+  overflow-y: auto;
+  background: #fff;
+  color: #111;
+  border: 2px solid #111;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+  z-index: 2147483001;
+  font: 13px -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  padding: 8px;
+  box-sizing: border-box;
+}
+
+.pv-panel-header {
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 4px 4px 8px;
+  border-bottom: 2px solid #111;
+  margin-bottom: 6px;
+}
+
+.pv-panel-list {
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.pv-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 4px;
+  border-bottom: 1px solid #ddd;
+  gap: 6px;
+}
+
+.pv-item:last-child {
+  border-bottom: none;
+}
+
+.pv-item-title {
+  flex: 1;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 4px 2px;
+  font-weight: 500;
+}
+
+.pv-item-title:hover {
+  text-decoration: underline;
+}
+
+.pv-item-actions {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.pv-btn-small {
+  background: #fff;
+  color: #111;
+  border: 1.5px solid #111;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 6px;
+  cursor: pointer;
+}
+
+.pv-btn-small:hover {
+  background: #111;
+  color: #fff;
+}
+
+.pv-btn-add {
+  width: 100%;
+  margin-top: 8px;
+  background: #fff;
+  color: #111;
+  border: 2px solid #111;
+  border-radius: 6px;
+  padding: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.pv-btn-add:hover {
+  background: #111;
+  color: #fff;
+}
+
+.pv-empty {
+  padding: 12px 4px;
+  color: #555;
+  font-size: 12px;
+  text-align: center;
+}
+
+.pv-form {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.pv-input {
+  border: 1.5px solid #111;
+  border-radius: 4px;
+  padding: 6px 8px;
+  font-size: 12px;
+}
+
+.pv-textarea {
+  border: 1.5px solid #111;
+  border-radius: 4px;
+  padding: 6px 8px;
+  font-size: 12px;
+  min-height: 90px;
+  resize: vertical;
+  font-family: inherit;
+}
+
+.pv-form-btns {
+  display: flex;
+  gap: 6px;
+}
+
+.pv-form-btns .pv-btn-add {
+  margin-top: 0;
+}

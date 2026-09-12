@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Prompt Vault</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <header>
+    <span class="logo-mark">PV</span>
+    <span class="title">Prompt Vault</span>
+  </header>
+
+  <div id="list" class="list"></div>
+
+  <button id="newBtn" class="btn-add">+ New Prompt</button>
+
+  <div id="formView" class="form-view hidden">
+    <input id="titleInput" class="input" placeholder="Title" />
+    <textarea id="textInput" class="textarea" placeholder="Prompt text"></textarea>
+    <div class="form-btns">
+      <button id="saveBtn" class="btn-add">Save</button>
+      <button id="cancelBtn" class="btn-small">Cancel</button>
+    </div>
+  </div>
+
+  <footer>Click a prompt to inject it into the page's AI input box.</footer>
+  <div id="status" class="status"></div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
